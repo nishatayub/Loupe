@@ -1,13 +1,24 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { SplitText } from "gsap/SplitText";
 import { CustomEase } from "gsap/CustomEase";
 import Lenis from "lenis";
 
+const FILMS = [
+  { slug: "film-static", title: "Static — M. Reyes" },
+  { slug: "film-neon-exit", title: "Neon Exit — K. Osei" },
+  { slug: "film-redline", title: "Redline — J. Park" },
+  { slug: "film-afterglow", title: "Afterglow — S. Lindqvist" },
+];
+
 export default function Home() {
+  const [activeFilm, setActiveFilm] = useState(0);
+  const goNext = () => setActiveFilm((i) => (i + 1) % FILMS.length);
+  const goPrev = () => setActiveFilm((i) => (i - 1 + FILMS.length) % FILMS.length);
+
   useEffect(() => {
     gsap.registerPlugin(ScrollTrigger, SplitText, CustomEase);
     CustomEase.create("verticalEase", "0.65, 0, 0.35, 1");
@@ -140,18 +151,6 @@ export default function Home() {
       },
     });
 
-    /* ===================== PROJECTS GRID: clip-path reveal, staggered, once ===================== */
-    const projectsTween = gsap.to(".project-card", {
-      clipPath: "inset(0% 0 0 0)",
-      duration: 1.2,
-      ease: "verticalEase",
-      stagger: 0.1,
-      scrollTrigger: {
-        trigger: "#projects-grid",
-        start: "top 80%",
-      },
-    });
-
     /* ===================== Card tilt (mousemove 3D tilt) ===================== */
     const tiltCards = document.querySelectorAll(".cardTilt");
     const tiltHandlers = [];
@@ -169,30 +168,6 @@ export default function Home() {
       card.addEventListener("mouseleave", onLeaveCard);
       tiltHandlers.push({ card, onMove, onLeaveCard });
     });
-
-    /* ===================== Upload steps hover-image follower ===================== */
-    const hoverRoot = document.querySelector("[data-hover-image-root]");
-    const hoverPreview = document.querySelector("[data-hover-image-preview]");
-    const hoverRowHandlers = [];
-    if (hoverRoot && hoverPreview) {
-      const rows = document.querySelectorAll("[data-hover-image-list] a");
-      const setPreview = (img) => {
-        hoverPreview.innerHTML = `<img src="/media/images/${img}" alt="" class="w-full h-full rounded-xl object-cover" />`;
-      };
-      if (rows[0]) setPreview(rows[0].dataset.hoverImage);
-      rows.forEach((row) => {
-        const onRowEnter = () => {
-          setPreview(row.dataset.hoverImage);
-          gsap.fromTo(
-            hoverPreview,
-            { opacity: 0, scale: 0.92 },
-            { opacity: 1, scale: 1, duration: 0.35, ease: "power2.out" }
-          );
-        };
-        row.addEventListener("mouseenter", onRowEnter);
-        hoverRowHandlers.push({ row, onRowEnter });
-      });
-    }
 
     /* ===================== CTA: pinned logo zoom ===================== */
     const logoZoomTween = gsap.to("#logo-zoom", {
@@ -293,7 +268,6 @@ export default function Home() {
         card.removeEventListener("mousemove", onMove);
         card.removeEventListener("mouseleave", onLeaveCard);
       });
-      hoverRowHandlers.forEach(({ row, onRowEnter }) => row.removeEventListener("mouseenter", onRowEnter));
       if (trailArea && ctaSection) ctaSection.removeEventListener("mousemove", onCtaMouseMove);
       splitInstances.forEach((s) => s.revert());
       ScrollTrigger.getAll().forEach((st) => st.kill());
@@ -514,6 +488,25 @@ export default function Home() {
           </div>
         </div>
 
+        {/* ============ AMBIENT VIDEO INTERLUDE ============ */}
+        <section className="relative h-screen w-full overflow-hidden flex items-center justify-center">
+          <video
+            src="/media/videos/film-afterglow.mp4"
+            className="absolute inset-0 w-full h-full object-cover"
+            autoPlay
+            muted
+            loop
+            playsInline
+          />
+          <div className="absolute inset-0 bg-black/50" />
+          <div className="relative z-10 container text-center max-w-3xl mx-auto">
+            <p className="font-mono text-xs uppercase tracking-widest text-brand mb-4">Why Loupe</p>
+            <p className="font-display text-2xl lg:text-4xl font-medium text-white leading-snug">
+              Every filmmaker starts somewhere small — a phone, a weekend, a story that wouldn&rsquo;t leave them alone. Loupe is where that first cut finds an audience.
+            </p>
+          </div>
+        </section>
+
         <div className="relative z-10 w-full bg-ink flex items-center pointer-events-auto" id="projects-heading">
           <div className="container py-12 flex max-sm:flex-col gap-6 sm:items-center justify-between">
             <h2 className="text-brand font-display text-4xl lg:text-6xl font-medium" id="discover">Discover</h2>
@@ -526,42 +519,62 @@ export default function Home() {
           </div>
         </div>
 
-        {/* ============ FEATURED FILMS GRID ============ */}
+        {/* ============ FEATURED FILM (single, auto-advancing) ============ */}
         <div className="relative z-10 bg-ink/95">
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4 container py-16" id="projects-grid">
-            {[
-              ["film-static", "Static — M. Reyes"],
-              ["film-neon-exit", "Neon Exit — K. Osei"],
-              ["film-redline", "Redline — J. Park"],
-              ["film-afterglow", "Afterglow — S. Lindqvist"],
-            ].map(([slug, title]) => (
-              <div className="project-card" key={slug}>
-                <a className="cardTilt relative w-full text-white flex flex-col justify-end" href="#">
-                  <div className="overflow-hidden rounded-md">
-                    <div className="aspect-square">
-                      <video
-                        src={`/media/videos/${slug}.mp4`}
-                        poster={`/media/images/posters/${slug}.jpg`}
-                        className="w-full h-full object-cover"
-                        muted
-                        loop
-                        playsInline
-                        preload="none"
-                        onMouseEnter={(e) => e.currentTarget.play().catch(() => {})}
-                        onMouseLeave={(e) => {
-                          e.currentTarget.pause();
-                          e.currentTarget.currentTime = 0;
-                        }}
-                      />
-                    </div>
+          <div className="container py-16" id="projects-grid">
+            <div className="cardTilt relative w-[80vw] max-w-6xl mx-auto text-white">
+              <div className="flex items-center gap-4 lg:gap-6">
+                <button
+                  onClick={goPrev}
+                  aria-label="Previous film"
+                  className="shrink-0 w-11 h-11 rounded-full border border-white/20 hover:bg-brand hover:text-ink hover:border-brand flex items-center justify-center transition-colors"
+                >
+                  <svg width="8" height="10" viewBox="0 0 8 8" fill="none" xmlns="http://www.w3.org/2000/svg" className="rotate-180">
+                    <path d="M0.350098 0.349976H6.7501V6.74998" stroke="currentColor" strokeWidth="1" strokeLinecap="square" />
+                  </svg>
+                </button>
+                <div className="overflow-hidden rounded-md relative flex-1">
+                  <div className="aspect-video">
+                    <video
+                      key={FILMS[activeFilm].slug}
+                      src={`/media/videos/${FILMS[activeFilm].slug}.mp4`}
+                      poster={`/media/images/posters/${FILMS[activeFilm].slug}.jpg`}
+                      className="w-full h-full object-cover"
+                      autoPlay
+                      muted
+                      playsInline
+                      preload="metadata"
+                      onEnded={goNext}
+                    />
                   </div>
-                  <div className="flex flex-col gap-2 mt-6">
-                    <h3 className="uppercase text-base text-brand">{title}</h3>
-                    <p className="text-sm opacity-60">2025</p>
-                  </div>
-                </a>
+                </div>
+                <button
+                  onClick={goNext}
+                  aria-label="Next film"
+                  className="shrink-0 w-11 h-11 rounded-full border border-white/20 hover:bg-brand hover:text-ink hover:border-brand flex items-center justify-center transition-colors"
+                >
+                  <svg width="8" height="10" viewBox="0 0 8 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M0.350098 0.349976H6.7501V6.74998" stroke="currentColor" strokeWidth="1" strokeLinecap="square" />
+                  </svg>
+                </button>
               </div>
-            ))}
+              <div className="flex items-center justify-between mt-6">
+                <div className="flex flex-col gap-2">
+                  <h3 className="uppercase text-base text-brand">{FILMS[activeFilm].title}</h3>
+                  <p className="text-sm opacity-60">2025</p>
+                </div>
+                <div className="flex gap-2">
+                  {FILMS.map((f, i) => (
+                    <button
+                      key={f.slug}
+                      onClick={() => setActiveFilm(i)}
+                      aria-label={`Show ${f.title}`}
+                      className={`w-2 h-2 rounded-full transition-colors ${i === activeFilm ? "bg-brand" : "bg-white/20"}`}
+                    />
+                  ))}
+                </div>
+              </div>
+            </div>
           </div>
 
           {/* ============ UPLOAD / COMMUNITY ============ */}
@@ -575,45 +588,38 @@ export default function Home() {
                 <div className="h-10 lg:h-16"></div>
               </div>
             </div>
-            <div className="grid lg:grid-cols-12 gap-6">
-              <div className="lg:col-span-4 max-lg:hidden">
-                <div className="hover-image-root aspect-[4/5] flex justify-center items-center" data-hover-image-root="">
-                  <div className="relative max-w-[380px] max-h-[380px] w-full h-full flex justify-center items-center" data-hover-image-preview=""></div>
-                </div>
-              </div>
-              <div className="lg:col-span-8">
-                <div className="border-t border-white/10 flex flex-col" data-hover-image-list="">
-                  {[
-                    ["Upload Your File", "Direct upload or link", "retro-vinyl-turntable.jpg"],
-                    ["Add the Details", "Title, genre, credits", "film-reel-flatlay.jpg"],
-                    ["Choose a License", "CC-BY / All Rights Reserved", "retro-rotary-phone.jpg"],
-                    ["Publish", "Live on Loupe in minutes", "boombox-hollywood-neon.jpg"],
-                    ["Report & Takedown", "DMCA-compliant review", "retro-tv-wall-arcade.jpg"],
-                  ].map(([name, type, img]) => (
-                    <a
-                      href="#"
-                      key={name}
-                      className="ps-4 grow flex group border-b border-white/10 py-4 transition-all duration-150 hover:grow-[6]"
-                      data-hover-image={img}
-                    >
-                      <div className="grid grid-cols-12 items-center w-full">
-                        <div className="col-span-6 group-hover:scale-110 origin-left transition-transform duration-200 ease-out uppercase">{name}</div>
-                        <div className="col-span-4 ps-5 opacity-60 text-sm">{type}</div>
-                        <div className="col-span-2 place-items-center">
-                          <svg className="group-hover:rotate-45 transition-transform duration-300" width="8" height="8" viewBox="0 0 8 8" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M0.350098 0.349976H6.7501V6.74998" stroke="currentColor" strokeWidth="1" strokeLinecap="square" /></svg>
-                        </div>
+            <div className="w-full">
+              <div className="border-t border-white/10 flex flex-col" data-hover-image-list="">
+                {[
+                  ["Upload Your File", "Direct upload or link"],
+                  ["Add the Details", "Title, genre, credits"],
+                  ["Choose a License", "CC-BY / All Rights Reserved"],
+                  ["Publish", "Live on Loupe in minutes"],
+                  ["Report & Takedown", "DMCA-compliant review"],
+                ].map(([name, type]) => (
+                  <a
+                    href="#"
+                    key={name}
+                    className="relative overflow-hidden ps-4 grow flex group border-b border-white/10 py-6 lg:py-8 transition-all duration-150 hover:grow-[6]"
+                  >
+                    <div className="absolute inset-0 bg-brand scale-x-0 group-hover:scale-x-100 origin-left transition-transform duration-[850ms] ease-out" />
+                    <div className="relative z-10 grid grid-cols-12 items-center w-full text-white group-hover:text-black transition-colors duration-[850ms]">
+                      <div className="col-span-7 lg:col-span-8 group-hover:scale-110 origin-left transition-transform duration-200 ease-out uppercase text-lg lg:text-2xl">{name}</div>
+                      <div className="col-span-3 lg:col-span-2 ps-5 opacity-60 text-sm lg:text-base">{type}</div>
+                      <div className="col-span-2 place-items-center">
+                        <svg className="group-hover:rotate-45 transition-transform duration-300" width="10" height="10" viewBox="0 0 8 8" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M0.350098 0.349976H6.7501V6.74998" stroke="currentColor" strokeWidth="1" strokeLinecap="square" /></svg>
                       </div>
-                    </a>
-                  ))}
-                </div>
-                <div className="h-10 lg:h-16"></div>
-                <a href="#" className="btn">
-                  <span className="w-full px-5 py-3 rounded-full bg-brand text-ink flex gap-8 justify-between items-center">
-                    <strong>Start Uploading</strong>
-                    <svg width="8" height="10" viewBox="0 0 8 8" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M0.350098 0.349976H6.7501V6.74998" stroke="currentColor" strokeWidth="1" strokeLinecap="square" /></svg>
-                  </span>
-                </a>
+                    </div>
+                  </a>
+                ))}
               </div>
+              <div className="h-10 lg:h-16"></div>
+              <a href="#" className="btn">
+                <span className="w-full px-5 py-3 rounded-full bg-brand text-ink flex gap-8 justify-between items-center">
+                  <strong>Start Uploading</strong>
+                  <svg width="8" height="10" viewBox="0 0 8 8" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M0.350098 0.349976H6.7501V6.74998" stroke="currentColor" strokeWidth="1" strokeLinecap="square" /></svg>
+                </span>
+              </a>
             </div>
           </section>
 
@@ -755,7 +761,6 @@ export default function Home() {
                   <div className="opacity-50">© 2026 LOUPE — a home for short films</div>
                   <div className="flex gap-6">
                     <a href="#" className="link-underline">Privacy Policy</a>
-                    <a href="#" className="link-underline">Built with Claude</a>
                   </div>
                 </div>
               </div>

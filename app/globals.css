@@ -180,10 +180,6 @@ body.nav-open .nav-icon {
   opacity: 0;
 }
 
-/* ---------- Project cards ---------- */
-.project-card {
-  clip-path: inset(100% 0 0 0);
-}
 .cardTilt {
   display: block;
   transform-style: preserve-3d;
@@ -191,15 +187,6 @@ body.nav-open .nav-icon {
   transition: transform 0.15s ease-out;
 }
 
-/* ---------- Rental hover-image follower ---------- */
-.hover-image-root {
-  position: sticky;
-  top: 0;
-}
-.hover-image-preview {
-  border-radius: 12px;
-  overflow: hidden;
-}
 [data-hover-image-list] a {
   position: relative;
 }
