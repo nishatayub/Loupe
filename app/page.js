@@ -457,7 +457,7 @@ export default function Home() {
                 </div>
               </div>
 
-              <div className="grid gap-4 sm:gap-0 sm:grid-cols-2 lg:grid-cols-4">
+              <div className="reveal-up grid gap-4 sm:gap-0 sm:grid-cols-2 lg:grid-cols-4">
                 {[
                   ["01", "Upload", "retro-vinyl-turntable.jpg", "Share your short film in minutes"],
                   ["02", "Discover", "neon-static-tv-duo.jpg", "Browse curated shorts from creators worldwide"],
@@ -499,7 +499,7 @@ export default function Home() {
             playsInline
           />
           <div className="absolute inset-0 bg-black/50" />
-          <div className="relative z-10 container text-center max-w-3xl mx-auto">
+          <div className="reveal-up relative z-10 container text-center max-w-3xl mx-auto">
             <p className="font-mono text-xs uppercase tracking-widest text-brand mb-4">Why Loupe</p>
             <p className="font-display text-2xl lg:text-4xl font-medium text-white leading-snug">
               Every filmmaker starts somewhere small — a phone, a weekend, a story that wouldn&rsquo;t leave them alone. Loupe is where that first cut finds an audience.
@@ -508,7 +508,7 @@ export default function Home() {
         </section>
 
         <div className="relative z-10 w-full bg-ink flex items-center pointer-events-auto" id="projects-heading">
-          <div className="container py-12 flex max-sm:flex-col gap-6 sm:items-center justify-between">
+          <div className="reveal-up container py-12 flex max-sm:flex-col gap-6 sm:items-center justify-between">
             <h2 className="text-brand font-display text-4xl lg:text-6xl font-medium" id="discover">Discover</h2>
             <a href="#projects-grid" className="btn">
               <span className="w-full px-5 py-3 rounded-full bg-brand text-ink flex gap-8 justify-between items-center">
@@ -522,7 +522,7 @@ export default function Home() {
         {/* ============ FEATURED FILM (single, auto-advancing) ============ */}
         <div className="relative z-10 bg-ink/95">
           <div className="container py-16" id="projects-grid">
-            <div className="cardTilt relative w-[80vw] max-w-6xl mx-auto text-white">
+            <div className="reveal-up cardTilt relative w-[80vw] max-w-6xl mx-auto text-white">
               <div className="flex items-center gap-4 lg:gap-6">
                 <button
                   onClick={goPrev}
@@ -579,7 +579,7 @@ export default function Home() {
 
           {/* ============ UPLOAD / COMMUNITY ============ */}
           <section className="container py-16" id="upload">
-            <div className="grid lg:grid-cols-12 gap-6">
+            <div className="reveal-up grid lg:grid-cols-12 gap-6">
               <div className="lg:col-span-4">
                 <h2 className="uppercase text-base text-brand">Upload</h2>
               </div>
@@ -588,7 +588,7 @@ export default function Home() {
                 <div className="h-10 lg:h-16"></div>
               </div>
             </div>
-            <div className="w-full">
+            <div className="reveal-up w-full">
               <div className="border-t border-white/10 flex flex-col" data-hover-image-list="">
                 {[
                   ["Upload Your File", "Direct upload or link"],
@@ -653,7 +653,7 @@ export default function Home() {
           <span className="noise opacity-[0.03]"></span>
           <canvas id="footer-canvas" className="pointer-events-none absolute inset-0 w-full h-full"></canvas>
           <div className="w-full container relative z-10 pb-8">
-            <div className="grid grid-cols-12 gap-6 gap-y-10">
+            <div className="reveal-up grid grid-cols-12 gap-6 gap-y-10">
               <div className="col-span-12 lg:col-span-6 mt-16 flex items-center gap-3">
                 <svg className="w-[40px] h-[40px] text-white" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <circle cx="42" cy="42" r="30" stroke="currentColor" strokeWidth="8" />
